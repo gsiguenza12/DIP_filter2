@@ -12,7 +12,8 @@ Gabriel Alfredo Siguenza, CS 5550 Digital Image Processing
 Hw 3
 Dr. Amar Raheja
 Date: 10-22-2023
-Last modified: 10-22-2023
+Last modified: 10-23-2023
+
 """
 
 # Importing Libraries
