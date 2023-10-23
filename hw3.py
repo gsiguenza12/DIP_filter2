@@ -143,32 +143,254 @@ def arithmetic_mean_filter(image, mask_size=(3, 3)):
     return output_image
 
 
-def geometric_mean_filter():
-    return 0
+# TODO: test filter
+def geometric_mean_filter(image, mask_size=(3, 3)):
+
+    # Get the height and width of the image
+    height, width = image.shape[:2]
+
+    # If the mask size is given as a single number, assume it's a square mask
+    if isinstance(mask_size, int):
+        mask_size = (mask_size, mask_size)
+
+    mask_height, mask_width = mask_size
+
+    # Initialize an empty output image
+    output_image = np.zeros_like(image)
+
+    # Calculate the border size for the mask
+    border_height = mask_height // 2
+    border_width = mask_width // 2
+
+    # Iterate over each pixel in the image
+    for y in range(height):
+        for x in range(width):
+            # Calculate the coordinates of the mask region for the current pixel
+            y_min = max(0, y - border_height)
+            y_max = min(height, y + border_height + 1)
+            x_min = max(0, x - border_width)
+            x_max = min(width, x + border_width + 1)
+
+            # Extract the region from the original image
+            region = image[y_min:y_max, x_min:x_max]
+
+            # Calculate the geometric mean of the region and set it as the pixel value in the output image
+            output_image[y, x] = np.exp(np.mean(np.log(region + 1))) - 1
+
+    return output_image
 
 
-def harmonic_mean_filter():
-    return 0
+# TODO: test filter
+def harmonic_mean_filter(image, mask_size=(3, 3)):
+    # Get the height and width of the image
+    height, width = image.shape[:2]
+
+    # If the mask size is given as a single number, assume it's a square mask
+    if isinstance(mask_size, int):
+        mask_size = (mask_size, mask_size)
+
+    mask_height, mask_width = mask_size
+
+    # Initialize an empty output image
+    output_image = np.zeros_like(image)
+
+    # Calculate the border size for the mask
+    border_height = mask_height // 2
+    border_width = mask_width // 2
+
+    # Iterate over each pixel in the image
+    for y in range(height):
+        for x in range(width):
+            # Calculate the coordinates of the mask region for the current pixel
+            y_min = max(0, y - border_height)
+            y_max = min(height, y + border_height + 1)
+            x_min = max(0, x - border_width)
+            x_max = min(width, x + border_width + 1)
+
+            # Extract the region from the original image
+            region = image[y_min:y_max, x_min:x_max]
+
+            # Calculate the harmonic mean of the region and set it as the pixel value in the output image
+            output_image[y, x] = len(region) / np.sum(1.0 / (region + 1e-6))
+
+    return output_image
 
 
-def contraharmonic_mean_filter():
-    return 0
+# TODO: test filter
+def contraharmonic_mean_filter(image, mask_size=(3, 3), Q=1):
+    # Get the height and width of the image
+    height, width = image.shape[:2]
+
+    # If the mask size is given as a single number, assume it's a square mask
+    if isinstance(mask_size, int):
+        mask_size = (mask_size, mask_size)
+
+    mask_height, mask_width = mask_size
+
+    # Initialize an empty output image
+    output_image = np.zeros_like(image)
+
+    # Calculate the border size for the mask
+    border_height = mask_height // 2
+    border_width = mask_width // 2
+
+    # Iterate over each pixel in the image
+    for y in range(height):
+        for x in range(width):
+            # Calculate the coordinates of the mask region for the current pixel
+            y_min = max(0, y - border_height)
+            y_max = min(height, y + border_height + 1)
+            x_min = max(0, x - border_width)
+            x_max = min(width, x + border_width + 1)
+
+            # Extract the region from the original image
+            region = image[y_min:y_max, x_min:x_max]
+
+            # Calculate the contraharmonic mean using the formula
+            num = np.sum(region**(Q + 1))
+            denom = np.sum(region**Q)
+            output_image[y, x] = num / (denom + 1e-6)
+
+    return output_image
 
 
-def max_filter():
-    return 0
+# TODO: test filter
+def max_filter(image, mask_size=(3, 3)):
+    # Get the height and width of the image
+    height, width = image.shape[:2]
+
+    # If the mask size is given as a single number, assume it's a square mask
+    if isinstance(mask_size, int):
+        mask_size = (mask_size, mask_size)
+
+    mask_height, mask_width = mask_size
+
+    # Initialize an empty output image
+    output_image = np.zeros_like(image)
+
+    # Calculate the border size for the mask
+    border_height = mask_height // 2
+    border_width = mask_width // 2
+
+    # Iterate over each pixel in the image
+    for y in range(height):
+        for x in range(width):
+            # Calculate the coordinates of the mask region for the current pixel
+            y_min = max(0, y - border_height)
+            y_max = min(height, y + border_height + 1)
+            x_min = max(0, x - border_width)
+            x_max = min(width, x + border_width + 1)
+
+            # Extract the region from the original image
+            region = image[y_min:y_max, x_min:x_max]
+
+            # Calculate the maximum value in the region and set it as the pixel value in the output image
+            output_image[y, x] = np.max(region)
+
+    return output_image
 
 
-def min_filter():
-    return 0
+# TODO: test filter
+def min_filter(image, mask_size=(3, 3)):
+    # Get the height and width of the image
+    height, width = image.shape[:2]
+
+    # If the mask size is given as a single number, assume it's a square mask
+    if isinstance(mask_size, int):
+        mask_size = (mask_size, mask_size)
+
+    mask_height, mask_width = mask_size
+
+    # Initialize an empty output image
+    output_image = np.zeros_like(image)
+
+    # Calculate the border size for the mask
+    border_height = mask_height // 2
+    border_width = mask_width // 2
+
+    # Iterate over each pixel in the image
+    for y in range(height):
+        for x in range(width):
+            # Calculate the coordinates of the mask region for the current pixel
+            y_min = max(0, y - border_height)
+            y_max = min(height, y + border_height + 1)
+            x_min = max(0, x - border_width)
+            x_max = min(width, x + border_width + 1)
+
+            # Extract the region from the original image
+            region = image[y_min:y_max, x_min:x_max]
+
+            # Calculate the minimum value in the region and set it as the pixel value in the output image
+            output_image[y, x] = np.min(region)
+
+    return output_image
 
 
-def midpoint_filter():
-    return 0
+# TODO: test filter
+def midpoint_filter(image, mask_size=(3, 3)):
+    # Ensure the mask size is odd for a proper center
+    mask_rows, mask_cols = mask_size
+    if mask_rows % 2 == 0 or mask_cols % 2 == 0:
+        raise ValueError("Mask size must be odd in both dimensions")
+
+    # Get image dimensions
+    rows, cols = image.shape[:2]
+
+    # Initialize the result image
+    result_image = np.copy(image)
+
+    # Calculate the padding needed for the mask
+    pad_rows = mask_rows // 2
+    pad_cols = mask_cols // 2
+
+    for i in range(pad_rows, rows - pad_rows):
+        for j in range(pad_cols, cols - pad_cols):
+            # Extract the neighborhood within the mask
+            neighborhood = image[i - pad_rows:i + pad_rows + 1, j - pad_cols:j + pad_cols + 1]
+
+            # Calculate the midpoint value within the neighborhood
+            midpoint = (np.min(neighborhood) + np.max(neighborhood)) // 2
+
+            # Replace the pixel with the midpoint value
+            result_image[i, j] = midpoint
+
+    return result_image
 
 
-def alpha_trimmed_mean_filter():
-    return 0
+# TODO: test filter
+def alpha_trimmed_mean_filter(image, mask_size=(3, 3), alpha=2):
+    # Ensure the mask size is odd for a proper center
+    mask_rows, mask_cols = mask_size
+    if mask_rows % 2 == 0 or mask_cols % 2 == 0:
+        raise ValueError("Mask size must be odd in both dimensions")
+
+    # Get image dimensions
+    rows, cols = image.shape[:2]
+
+    # Initialize the result image
+    result_image = np.copy(image)
+
+    # Calculate the padding needed for the mask
+    pad_rows = mask_rows // 2
+    pad_cols = mask_cols // 2
+
+    for i in range(pad_rows, rows - pad_rows):
+        for j in range(pad_cols, cols - pad_cols):
+            # Extract the neighborhood within the mask
+            neighborhood = image[i - pad_rows:i + pad_rows + 1, j - pad_cols:j + pad_cols + 1]
+
+            # Flatten the neighborhood and remove the alpha lowest and alpha highest values
+            flattened_neighborhood = neighborhood.flatten()
+            sorted_neighborhood = np.sort(flattened_neighborhood)
+            trimmed_neighborhood = sorted_neighborhood[alpha:-alpha]
+
+            # Calculate the mean of the trimmed neighborhood
+            mean = np.mean(trimmed_neighborhood)
+
+            # Replace the pixel with the computed mean
+            result_image[i, j] = mean
+
+    return result_image
 
 
 ''' END OF FILTERS CODE'''
