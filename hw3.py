@@ -782,15 +782,16 @@ def process_image():
         zoomed_image = linear_interpolation(zoomed_image, 1 / zoom_factor_height)
 
     # Get user input for mask size (default: 3x3)
-    mask_size = input("Enter mask size (e.g., '3' for a 3x3 mask): ")
-    mask_size = int(mask_size) if mask_size.isdigit() else 3
+    # mask_size = input("Enter mask size (e.g., '3' for a 3x3 mask): ")
+    # mask_size = int(mask_size) if mask_size.isdigit() else 3
+    mask_size = 3
 
     # Get user input for A value for high-boost filter
-    A = input("Enter A value for high-boost filter: ")
-    A = float(A) if A.replace('.', '', 1).isdigit() else 1.0
+    # A = input("Enter A value for high-boost filter: ")
+    # A = float(A) if A.replace('.', '', 1).isdigit() else 1.0
+    A = 1
 
     # Apply the respective filters
-
     calc_hist(zoomed_image)
     # eq_image = local_histogram_equalization(image, mask_size)  # global histogram eq
     # kernel = np.ones((3, 3)) / 9
@@ -835,10 +836,22 @@ neighbour_button.pack(anchor=tk.W)
 linear_button.pack(anchor=tk.W)
 bilinear_button.pack(anchor=tk.W)
 
-# Create radio buttons for filter method
+# todo: implement function for filters
+# Create a drop-down menu for filter method
 filter_var = tk.StringVar(value="Geometric Mean Filter")
-geometric_button = ttk.Radiobutton(filter_frame, text="Geometric mean filter", variable=filter_var, value="Geometric Filter")
-geometric_button.pack(anchor=tk.W)
+filter_methods = [
+    "Geometric Mean Filter",
+    "Arithmetic Mean Filter",
+    "Harmonic Mean Filter",
+    "Contra Harmonic Mean Filter",
+    "Max Filter",
+    "Min Filter",
+    "Midpoint Filter",
+    "Alpha Trimmed Mean Filter"
+]
+filter_combobox = ttk.Combobox(filter_frame, textvariable=filter_var, values=filter_methods)
+filter_combobox.pack()
+
 
 # Create a frame for the bit plane slicing menu
 bits_frame = ttk.LabelFrame(root, text="Bit Plane Slicing")
@@ -862,19 +875,16 @@ original_image_label.grid(row=4, column=0, padx=10, pady=10)
 
 processed_image_label = tk.Label(root, text="Processed Image")
 processed_image_label.grid(row=4, column=1, padx=10, pady=10)
-# processed_image_label.pack(side=tk.RIGHT, padx=10, pady=10)
 
 # Create buttons for processing images
 bit_plane_button = ttk.Button(root, text="Process Image - Bit Plane Slicing", command=process_bit_plane_slicing)
 process_button = ttk.Button(root, text="Process Image", command=process_image)
 local_histogram_button = ttk.Button(root, text="Local Histogram Equalization", command=process_local_histogram)
-bit_plane_button.grid(row=5,columnspan=2,pady=(20))
-process_button.grid(row=6,columnspan=2,pady=(20))
-local_histogram_button.grid(row=7,columnspan=2,pady=(20))
-
-# bit_plane_button.pack(pady=10)
-# process_button.pack(pady=10)
-# local_histogram_button.pack(pady=10)
+histogram_button = ttk.Button(root, text="Global Histogram Equalization", command=process_global_histogram)
+bit_plane_button.grid(row=1,column=2,pady=(5))
+process_button.grid(row=0,column=2,pady=(5))
+local_histogram_button.grid(row=2,column=2,pady=(5))
+histogram_button.grid(row=3,column=2,pady=(5))
 
 # Run the main event loop
 root.mainloop()
