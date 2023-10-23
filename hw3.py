@@ -106,8 +106,47 @@ def nearest_neighbor_interpolation(image, zoom_factor_height, zoom_factor_width)
     return zoomed_image
 
 
+''' START OF HW3 FILTERS CODE '''
 
-''' START OF HW2 FILTERS CODE '''
+
+def arithmetic_mean_filter():
+
+    return 0
+
+
+def geometric_mean_filter():
+
+    return 0
+
+
+def harmonic_mean_filter():
+
+    return 0
+
+
+def contraharmonic_mean_filter():
+
+    return 0
+
+
+def max_filter():
+
+    return 0
+
+
+def min_filter():
+    return 0
+
+
+def midpoint_filter():
+    return 0
+
+
+def alpha_trimmed_mean_filter():
+    return 0
+
+
+''' END OF FILTERS CODE'''
 
 
 # Used to generate the kernel for each of the spatial filtering options
@@ -152,7 +191,6 @@ def apply_smoothing_filter(image, mask_size):
     return output_image
 
 
-
 # Function to apply a median filter, only removes noise as opposed to mean filter which smooths out
 # the variations in the data. Useful for removing salt and pepper noise.
 def apply_median_filter(image, mask_size):
@@ -160,7 +198,7 @@ def apply_median_filter(image, mask_size):
     filtered_image = np.zeros_like(image)
 
     # zeros must be padded around the row edge and the column edge.
-    padding = mask_size//2
+    padding = mask_size // 2
 
     # using the specified kernel size, list the pixel values covered by the kernel
     # determine median level, if the kernel covers an even number of pixels, the avg of two median values is used.
@@ -229,9 +267,6 @@ def apply_high_boost_filter(image, A, mask):
     high_boost_filtered_image = high_boost_filtered_image.astype(np.uint8)
 
     return high_boost_filtered_image
-
-
-''' END OF FILTERS CODE'''
 
 
 # histogram equalization, spatial domain
@@ -310,15 +345,6 @@ def remove_bit_planes(image, bits_to_remove):
 
 
 '''
-1.
-Vary the spatial resolution of this image from the given scale to 512x512 and down to 32x32 and then zoom it again to 
-see the loss of detail. 
-
-Use the nearest neighbor method, linear method (both x or y) and bi-linear interpolation method 
-for zooming it back the desired resolution.
-'''
-
-'''
 2.	
 Vary the gray level resolution of your image from 8-bit to a 1-bit image in steps of 1-bits. Let the user decide 
 how many number of bits or provide a selection from a drop-down menu.
@@ -339,16 +365,6 @@ def reduce_gray_resolution(image, bits):
     q_image = (img / L).astype(np.uint8)
     q_image = ((q_image / (L - 1)) * 255).astype(np.uint8)
 
-    # Scale the pixel values to the specified number of bits
-    # reduced_resolution_image = (max_pixel_value * (image / 255)).astype(np.uint8)
-
-    # Calculate the maximum pixel value for the specified number of bits
-    # max_pixel_value = 2 ** bit_plane - 1
-
-    # Multiply by 255 to visualize the bit plane
-    # reduced_resolution_image = bit_plane_image * 255
-
-    # return Image.fromarray(quantized_img)
     return q_image
 
 
@@ -537,13 +553,11 @@ def process_image():
     """ These calls are the simplified version of what I had before """
     # Convert images to PIL format for displaying in the GUI
     original_image = ImageTk.PhotoImage(Image.fromarray(image))
-    # processed_image = ImageTk.PhotoImage(Image.fromarray(zoomed_image))  # sets image to zoomed ^
+    # processed_image = ImageTk.PhotoImage(Image.fromarray(zoomed_image))  # sets image to zoomed
     # processed_image = ImageTk.PhotoImage(Image.fromarray(eq_image))  # sets image to HE
     processed_image = ImageTk.PhotoImage(Image.fromarray(median_filtered_image))
 
     set_images(original_image, processed_image)
-
-
 
 
 # TODO: improve GUI, clean up code for readability
@@ -598,14 +612,6 @@ mask_label.pack(anchor=tk.W)
 mask_size_entry = tk.Entry(root)
 mask_size_entry.pack(anchor=tk.W)
 
-# Create labels to display histograms
-# local_histogram_label = tk.Label(root, text="Local Histogram")
-# local_histogram_label.pack(side=tk.LEFT, padx=10, pady=10)
-
-# global_histogram_label = tk.Label(root, text="Global Histogram")
-# global_histogram_label.pack(side=tk.RIGHT, padx=10, pady=10)
-
-# Create labels to display the original and processed images
 original_image_label = tk.Label(root, text="Original Image")
 original_image_label.pack(side=tk.LEFT, padx=10, pady=10)
 
