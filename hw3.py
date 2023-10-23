@@ -21,7 +21,7 @@ import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 from PIL import Image, ImageTk
 import os
 import matplotlib.pyplot
@@ -137,9 +137,11 @@ def arithmetic_mean_filter(image, mask_size=(3, 3)):
 
             region = image[y_min:y_max, x_min:x_max]
 
-            # TODO: check if this call to np.mean can be rewritten
             # calc avg
-            output_image[y, x] = np.mean(region)
+            region_sum = np.sum(region)
+            num_pixels = (y_max - y_min) * (x_max - x_min)
+            output_image[y, x] = region_sum / num_pixels
+
     return output_image
 
 
@@ -677,7 +679,7 @@ def process_local_histogram():
         return
 
     # get the mask value
-    mask_size = int(mask_size_entry.get())
+    mask_size = int(mask_entry.get())
     local_he_image = local_histogram_equalization(image, mask_size)
 
     # calculate histogram for original image
@@ -807,7 +809,6 @@ def process_image():
     set_images(original_image, processed_image)
 
 
-# TODO: improve GUI, clean up code for readability
 # Create the main application window
 root = tk.Tk()
 root.title("Image Zooming with Linear Interpolation")
@@ -816,54 +817,63 @@ root.title("Image Zooming with Linear Interpolation")
 # open_button = tk.Button(root, text="Open Image", command=open_image)
 # open_button.pack(pady=10)
 
-# Create a button to open an image and process it using bit plane slicing
-bit_plane_button = tk.Button(root, text="Process Image - Bit Plane Slicing", command=process_bit_plane_slicing)
-bit_plane_button.pack(pady=10)
+# Create a frame for the radio buttons
+interpolation_frame = ttk.LabelFrame(root, text="Interpolation Method")
+# interpolation_frame.pack(side=tk.LEFT, padx=10, pady=10)
+interpolation_frame.grid(row=0, column=0, padx=10, pady=10)
+# Create a frame for the filter buttons
+filter_frame = ttk.LabelFrame(root, text="Filter Method")
+filter_frame.grid(row=0, column=1, padx=10, pady=10)
 
-# Create a button to open an image and process it
-process_button = tk.Button(root, text="Process Image - Interpolation", command=process_image)
-process_button.pack(pady=10)
-
-# Create radio buttons for interpolation selection
+# Create radio buttons for interpolation method
 interpolation_var = tk.StringVar(value="Nearest Neighbor")
-
-neighbour_button = tk.Radiobutton(root, text="Nearest Neighbor", variable=interpolation_var, value="Nearest Neighbor")
+neighbour_button = ttk.Radiobutton(interpolation_frame, text="Nearest Neighbor", variable=interpolation_var, value="Nearest Neighbor")
+linear_button = ttk.Radiobutton(interpolation_frame, text="Linear", variable=interpolation_var, value="Linear")
+bilinear_button = ttk.Radiobutton(interpolation_frame, text="Bilinear", variable=interpolation_var, value="Bilinear")
 neighbour_button.pack(anchor=tk.W)
-
-linear_button = tk.Radiobutton(root, text="Linear", variable=interpolation_var, value="Linear")
 linear_button.pack(anchor=tk.W)
-
-bilinear_button = tk.Radiobutton(root, text="Bilinear", variable=interpolation_var, value="Bilinear")
 bilinear_button.pack(anchor=tk.W)
 
-# Create a drop-down menu for selecting bit depth
+# Create radio buttons for filter method
+filter_var = tk.StringVar(value="Geometric Mean Filter")
+geometric_button = ttk.Radiobutton(filter_frame, text="Geometric mean filter", variable=filter_var, value="Geometric Filter")
+geometric_button.pack(anchor=tk.W)
+
+# Create a frame for the bit plane slicing menu
+bits_frame = ttk.LabelFrame(root, text="Bit Plane Slicing")
+bits_frame.grid(row=1, columnspan=2, pady=10)
+
+# Create a menu for selecting number of bits
 bits_var = tk.StringVar(value="8")  # Default to 8 bits
+bits_label = ttk.Label(bits_frame, text="Select number of bits:")
+bits_menu = ttk.OptionMenu(bits_frame, bits_var, *["1", "2", "3", "4", "5", "6", "7", "8"])
+bits_label.pack(side=tk.LEFT)
+bits_menu.pack(side=tk.LEFT)
 
-bits_label = tk.Label(root, text="Select number of bits (for bit plane slicing):")
-bits_label.pack(anchor=tk.W)
+mask_label = ttk.Label(root, text="Specify Mask Size (for local HE and spatial filters):")
+mask_label.grid(row=2, columnspan=2, pady=(20, 0))
 
-bits_menu = tk.OptionMenu(root, bits_var, *["1", "2", "3", "4", "5", "6", "7", "8"])
-bits_menu.pack(anchor=tk.W)
-
-# Create buttons to process image with local or global histogram equalization
-local_histogram_button = tk.Button(root, text="Local Histogram Equalization", command=process_local_histogram)
-local_histogram_button.pack(pady=10)
-
-global_histogram_button = tk.Button(root, text="Global Histogram Equalization", command=process_global_histogram)
-global_histogram_button.pack(pady=10)
-
-# Create an input box for a specified mask size
-mask_label = tk.Label(root, text="Specify Mask Size (for local HE and spatial filters):")
-mask_label.pack(anchor=tk.W)
-
-mask_size_entry = tk.Entry(root)
-mask_size_entry.pack(anchor=tk.W)
+mask_entry = tk.Entry(root)
+mask_entry.grid(row=3, columnspan=2)
 
 original_image_label = tk.Label(root, text="Original Image")
-original_image_label.pack(side=tk.LEFT, padx=10, pady=10)
+original_image_label.grid(row=4, column=0, padx=10, pady=10)
 
 processed_image_label = tk.Label(root, text="Processed Image")
-processed_image_label.pack(side=tk.RIGHT, padx=10, pady=10)
+processed_image_label.grid(row=4, column=1, padx=10, pady=10)
+# processed_image_label.pack(side=tk.RIGHT, padx=10, pady=10)
+
+# Create buttons for processing images
+bit_plane_button = ttk.Button(root, text="Process Image - Bit Plane Slicing", command=process_bit_plane_slicing)
+process_button = ttk.Button(root, text="Process Image", command=process_image)
+local_histogram_button = ttk.Button(root, text="Local Histogram Equalization", command=process_local_histogram)
+bit_plane_button.grid(row=5,columnspan=2,pady=(20))
+process_button.grid(row=6,columnspan=2,pady=(20))
+local_histogram_button.grid(row=7,columnspan=2,pady=(20))
+
+# bit_plane_button.pack(pady=10)
+# process_button.pack(pady=10)
+# local_histogram_button.pack(pady=10)
 
 # Run the main event loop
 root.mainloop()
