@@ -9,10 +9,10 @@ https://www.geeksforgeeks.org/python-opencv-getting-and-setting-pixels/
 https://www.codesansar.com/numerical-methods/linear-interpolation-python.htm
 
 Gabriel Alfredo Siguenza, CS 5550 Digital Image Processing
-Hw 2
+Hw 3
 Dr. Amar Raheja
-Date: 10-09-2023
-Last modified: 10-16-2023
+Date: 10-22-2023
+Last modified: 10-22-2023
 """
 
 # Importing Libraries
@@ -109,28 +109,53 @@ def nearest_neighbor_interpolation(image, zoom_factor_height, zoom_factor_width)
 ''' START OF HW3 FILTERS CODE '''
 
 
-def arithmetic_mean_filter():
+# TODO: test filter
+def arithmetic_mean_filter(image, mask_size=(3, 3)):
+    # Get height and width of image
+    height, width = image.shape[:2]
 
-    return 0
+    if isinstance(mask_size, int):
+        mask_size = (mask_size, mask_size)
+
+    mask_height, mask_width = mask_size
+
+    # init empty output image
+    output_image = np.zeros_like(image)
+
+    # calculate border size for mask
+    border_height = mask_height // 2
+    border_width = mask_width // 2
+
+    # iterate over pixels
+    for y in range(height):
+        for x in range(width):
+            # calc coordinates for mask region
+            y_min = max(0, y - border_height)
+            y_max = min(height, y + border_height + 1)
+            x_min = max(0, x - border_width)
+            x_max = min(0, x + border_width + 1)
+
+            region = image[y_min:y_max, x_min:x_max]
+
+            # TODO: check if this call to np.mean can be rewritten
+            # calc avg
+            output_image[y, x] = np.mean(region)
+    return output_image
 
 
 def geometric_mean_filter():
-
     return 0
 
 
 def harmonic_mean_filter():
-
     return 0
 
 
 def contraharmonic_mean_filter():
-
     return 0
 
 
 def max_filter():
-
     return 0
 
 
