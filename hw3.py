@@ -148,15 +148,14 @@ def arithmetic_mean_filter(image, mask_size=(3, 3)):
 
 # TODO: test filter
 def geometric_mean_filter(image, mask_size=(3, 3)):
-
     # Get the height and width of the image
     height, width = image.shape[:2]
 
     # If the mask size is given as a single number, assume it's a square mask
-    if isinstance(mask_size, int):
-        mask_size = (mask_size, mask_size)
+    # if isinstance(mask_size, int):
+    #     mask_size = (mask_size, mask_size)
 
-    mask_height, mask_width = mask_size
+    mask_height, mask_width = (mask_size, mask_size)
 
     # Initialize an empty output image
     output_image = np.zeros_like(image)
@@ -164,6 +163,8 @@ def geometric_mean_filter(image, mask_size=(3, 3)):
     # Calculate the border size for the mask
     border_height = mask_height // 2
     border_width = mask_width // 2
+
+    epsilon = 1e-8  # A small epsilon value to prevent division by zero
 
     # Iterate over each pixel in the image
     for y in range(height):
@@ -176,8 +177,15 @@ def geometric_mean_filter(image, mask_size=(3, 3)):
 
             # Extract the region from the original image
             region = image[y_min:y_max, x_min:x_max]
+            # Add epsilon to avoid division by zero and log of negative values
+            region = region + epsilon
 
             # Calculate the geometric mean of the region and set it as the pixel value in the output image
+            # Ensure the region contains no zeros or negative values
+            # if np.any(region <= 0):
+            #     output_image[y, x] = 0  # Handle division by zero
+            # else:
+            #     output_image[y, x] = np.exp(np.mean(np.log(region + 1))) - 1
             output_image[y, x] = np.exp(np.mean(np.log(region + 1))) - 1
 
     return output_image
@@ -221,6 +229,7 @@ def harmonic_mean_filter(image, mask_size=(3, 3)):
 
 # TODO: test filter
 def contraharmonic_mean_filter(image, mask_size=(3, 3), Q=1):
+    # where Q is the order of the filter
     # Get the height and width of the image
     height, width = image.shape[:2]
 
@@ -250,8 +259,8 @@ def contraharmonic_mean_filter(image, mask_size=(3, 3), Q=1):
             region = image[y_min:y_max, x_min:x_max]
 
             # Calculate the contraharmonic mean using the formula
-            num = np.sum(region**(Q + 1))
-            denom = np.sum(region**Q)
+            num = np.sum(region ** (Q + 1))
+            denom = np.sum(region ** Q)
             output_image[y, x] = num / (denom + 1e-6)
 
     return output_image
@@ -747,6 +756,82 @@ def set_images(og_image, proc_image):
     processed_image_label.image = proc_image
 
 
+# Function to apply selected filter and display results
+def process_filter():
+    # Open a file dialog to select an image
+    file_path = filedialog.askopenfilename()
+    if not file_path:
+        return
+    # Load the image using OpenCV
+    image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+    if image is None:
+        print("Error: Could not open or find the image.")
+        return
+
+    sel_filter = filter_var.get()
+
+    # Mask entry was set as a string needed to be converted in order to
+    # pass successfully to the filter function
+    mask = mask_entry.get()
+    if mask:
+        mask = mask.split(',')
+        mask = (int(mask[0]), int(mask[1]))
+    else:
+        mask = 3
+
+    # Initialize an output image
+    processed_image = np.zeros_like(image)
+
+    # Process the image based on the selected interpolation method
+    if sel_filter == "Geometric Mean Filter":
+        print("Geometric mean filter selected")
+        processed_image = geometric_mean_filter(image, mask)
+
+    elif sel_filter == "Arithmetic Mean Filter":
+        processed_image = arithmetic_mean_filter(image, mask)
+        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
+        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+    elif sel_filter == "Harmonic Mean Filter":
+        processed_image = harmonic_mean_filter(image, mask)
+        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
+        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+    elif sel_filter == "Contra Harmonic Mean Filter":
+        processed_image = contraharmonic_mean_filter(image, mask)
+        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
+        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+    elif sel_filter == "Max Filter":
+        processed_image = max_filter(image, mask)
+        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
+        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+    elif sel_filter == "Min Filter":
+        processed_image = min_filter(image, mask)
+        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
+        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+    elif sel_filter == "Midpoint Filter":
+        processed_image = midpoint_filter(image, mask)
+        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
+        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+    elif sel_filter == "Alpha Trimmed Mean Filter":
+        processed_image = alpha_trimmed_mean_filter(image, mask)
+
+    # Convert images to PIL format for displaying in the GUI
+    original_image = ImageTk.PhotoImage(Image.fromarray(image))
+    processed_image = ImageTk.PhotoImage(Image.fromarray(processed_image))
+
+    set_images(original_image, processed_image)
+
+    # Display the images in the GUI
+    # original_image_label.config(image=original_image)
+    # processed_image_label.config(image=processed_image)
+    # original_image_label.image = original_image
+    # processed_image_label.image = processed_image
+
+    # Update the GUI to show the processed image for each bit depth
+    root.update_idletasks()
+    root.update()
+
+    # return processed_image
+
 # Function to open an image file and display it
 def process_image():
     global original_image, processed_image_label
@@ -829,7 +914,8 @@ filter_frame.grid(row=0, column=1, padx=10, pady=10)
 
 # Create radio buttons for interpolation method
 interpolation_var = tk.StringVar(value="Nearest Neighbor")
-neighbour_button = ttk.Radiobutton(interpolation_frame, text="Nearest Neighbor", variable=interpolation_var, value="Nearest Neighbor")
+neighbour_button = ttk.Radiobutton(interpolation_frame, text="Nearest Neighbor", variable=interpolation_var,
+                                   value="Nearest Neighbor")
 linear_button = ttk.Radiobutton(interpolation_frame, text="Linear", variable=interpolation_var, value="Linear")
 bilinear_button = ttk.Radiobutton(interpolation_frame, text="Bilinear", variable=interpolation_var, value="Bilinear")
 neighbour_button.pack(anchor=tk.W)
@@ -838,7 +924,8 @@ bilinear_button.pack(anchor=tk.W)
 
 # todo: implement function for filters
 # Create a drop-down menu for filter method
-filter_var = tk.StringVar(value="Geometric Mean Filter")
+filter_var = tk.StringVar(value="None")
+
 filter_methods = [
     "Geometric Mean Filter",
     "Arithmetic Mean Filter",
@@ -851,7 +938,6 @@ filter_methods = [
 ]
 filter_combobox = ttk.Combobox(filter_frame, textvariable=filter_var, values=filter_methods)
 filter_combobox.pack()
-
 
 # Create a frame for the bit plane slicing menu
 bits_frame = ttk.LabelFrame(root, text="Bit Plane Slicing")
@@ -867,7 +953,7 @@ bits_menu.pack(side=tk.LEFT)
 mask_label = ttk.Label(root, text="Specify Mask Size (for local HE and spatial filters):")
 mask_label.grid(row=2, columnspan=2, pady=(20, 0))
 
-mask_entry = tk.Entry(root)
+mask_entry = tk.Entry(root, value=None)
 mask_entry.grid(row=3, columnspan=2)
 
 original_image_label = tk.Label(root, text="Original Image")
@@ -881,10 +967,13 @@ bit_plane_button = ttk.Button(root, text="Process Image - Bit Plane Slicing", co
 process_button = ttk.Button(root, text="Process Image", command=process_image)
 local_histogram_button = ttk.Button(root, text="Local Histogram Equalization", command=process_local_histogram)
 histogram_button = ttk.Button(root, text="Global Histogram Equalization", command=process_global_histogram)
-bit_plane_button.grid(row=1,column=2,pady=(5))
-process_button.grid(row=0,column=2,pady=(5))
-local_histogram_button.grid(row=2,column=2,pady=(5))
-histogram_button.grid(row=3,column=2,pady=(5))
+filter_button = ttk.Button(root, text="Apply selected filter", command=process_filter)
+
+bit_plane_button.grid(row=1, column=2, pady=(5))
+process_button.grid(row=0, column=2, pady=(5))
+local_histogram_button.grid(row=2, column=2, pady=(5))
+histogram_button.grid(row=3, column=2, pady=(5))
+filter_button.grid(row=4, column=2, pady=(5))
 
 # Run the main event loop
 root.mainloop()
