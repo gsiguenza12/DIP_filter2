@@ -134,7 +134,7 @@ def arithmetic_mean_filter(image, mask_size=(3, 3)):
             y_min = max(0, y - border_height)
             y_max = min(height, y + border_height + 1)
             x_min = max(0, x - border_width)
-            x_max = min(0, x + border_width + 1)
+            x_max = min(width, x + border_width + 1)
 
             region = image[y_min:y_max, x_min:x_max]
 
@@ -146,7 +146,6 @@ def arithmetic_mean_filter(image, mask_size=(3, 3)):
     return output_image
 
 
-# TODO: test filter
 def geometric_mean_filter(image, mask_size=(3, 3)):
     # Get the height and width of the image
     height, width = image.shape[:2]
@@ -228,7 +227,7 @@ def harmonic_mean_filter(image, mask_size=(3, 3)):
 
 
 # TODO: test filter
-def contraharmonic_mean_filter(image, mask_size=(3, 3), Q=1):
+def contraharmonic_mean_filter(image, mask_size=(3, 3), Q=2):
     # where Q is the order of the filter
     # Get the height and width of the image
     height, width = image.shape[:2]
@@ -267,7 +266,7 @@ def contraharmonic_mean_filter(image, mask_size=(3, 3), Q=1):
 
 
 # TODO: test filter
-def max_filter(image, mask_size=(3, 3)):
+def min_filter(image, mask_size=(3, 3)):
     # Get the height and width of the image
     height, width = image.shape[:2]
 
@@ -303,7 +302,7 @@ def max_filter(image, mask_size=(3, 3)):
 
 
 # TODO: test filter
-def min_filter(image, mask_size=(3, 3)):
+def max_filter(image, mask_size=(3, 3)):
     # Get the height and width of the image
     height, width = image.shape[:2]
 
@@ -341,7 +340,7 @@ def min_filter(image, mask_size=(3, 3)):
 # TODO: test filter
 def midpoint_filter(image, mask_size=(3, 3)):
     # Ensure the mask size is odd for a proper center
-    mask_rows, mask_cols = mask_size
+    mask_rows, mask_cols = mask_size, mask_size
     if mask_rows % 2 == 0 or mask_cols % 2 == 0:
         raise ValueError("Mask size must be odd in both dimensions")
 
@@ -372,7 +371,7 @@ def midpoint_filter(image, mask_size=(3, 3)):
 # TODO: test filter
 def alpha_trimmed_mean_filter(image, mask_size=(3, 3), alpha=2):
     # Ensure the mask size is odd for a proper center
-    mask_rows, mask_cols = mask_size
+    mask_rows, mask_cols = mask_size, mask_size
     if mask_rows % 2 == 0 or mask_cols % 2 == 0:
         raise ValueError("Mask size must be odd in both dimensions")
 
@@ -789,30 +788,41 @@ def process_filter():
 
     elif sel_filter == "Arithmetic Mean Filter":
         processed_image = arithmetic_mean_filter(image, mask)
-        # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
-        # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+        print("Arithmetic mean filter selected")
+
     elif sel_filter == "Harmonic Mean Filter":
         processed_image = harmonic_mean_filter(image, mask)
         # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
         # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+        print("Harmonic mean filter selected")
+
     elif sel_filter == "Contra Harmonic Mean Filter":
         processed_image = contraharmonic_mean_filter(image, mask)
         # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
         # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+        print("Harmonic mean filter selected")
+
     elif sel_filter == "Max Filter":
         processed_image = max_filter(image, mask)
         # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
         # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+        print("Max filter selected")
+
     elif sel_filter == "Min Filter":
         processed_image = min_filter(image, mask)
         # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
         # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+        print("Min filter selected")
+
     elif sel_filter == "Midpoint Filter":
         processed_image = midpoint_filter(image, mask)
         # zoomed_image = bilinear_interpolation(image, zoom_factor_height, zoom_factor_width)
         # zoomed_image = bilinear_interpolation(zoomed_image, 1 / zoom_factor_height, 1 / zoom_factor_width)
+        print("Midpoint filter selected")
+
     elif sel_filter == "Alpha Trimmed Mean Filter":
         processed_image = alpha_trimmed_mean_filter(image, mask)
+        print("Alpha trimmed mean filter selected")
 
     # Convert images to PIL format for displaying in the GUI
     original_image = ImageTk.PhotoImage(Image.fromarray(image))
@@ -831,6 +841,7 @@ def process_filter():
     root.update()
 
     # return processed_image
+
 
 # Function to open an image file and display it
 def process_image():
